@@ -1,17 +1,3 @@
----
-title: "TP 1 - EEA"
-author: "Federico Fliguer"
-date: "11 de octubre de 2019"
-output:
-  html_document:
-    df_print: paged
-    toc: yes
-  html_notebook:
-    depth: 3
-    toc: yes
-    toc_float: yes
----
-
 # TP1
 
 ## 0. Seteo de la herramienta
