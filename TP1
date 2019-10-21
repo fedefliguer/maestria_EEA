@@ -12,6 +12,8 @@ output:
     toc_float: yes
 ---
 
+# TP1
+
 ## 0. Seteo de la herramienta
 
 Seteo de paquetes y de opciones para que en los gráficos no se disponga la notación científica.
