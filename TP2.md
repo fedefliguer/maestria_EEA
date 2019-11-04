@@ -1,14 +1,4 @@
----
-title: "TP 2 - EEA"
-author: "Federico Fliguer"
-date: "1 de noviembre de 2019"
-output:
-  html_document:
-    toc: true
-    toc_float: true
-    theme: united
-    highlight: tango
----
+# TP2
 
 ## 0. Seteo de la herramienta
 
