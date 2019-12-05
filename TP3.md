@@ -90,7 +90,7 @@ modelo = glm(Survived ~ Pclass + Sex + Age, family = 'binomial', data = train)
 tidy(modelo)
 ```
 
-Al ser basales las variables clase y género, la ausencia de activación de variables indicará que el caso del intercepto es un caso de una mujer (sin Sexmale activo) de primera clase (sin PClass2 ni PClass3 activo). Sin embargo, al incluir la variable edad ese caso será el de una mujer de 0 años en primera clase. Los casos en los que se activan las otras variables (es segunda o tercera clase en vez de primera, es hombre en vez de mujer) disminuyen la probabilidad de supervivencia. El hecho de tener más años también lo hace. En todos los casos se trata de coeficiente significativos. Con respecto a la edad, una salvedad: será de esperar que la supervivencia según la edad no sea una relación lineal, ya que podrán sobrevivir más los niños pero también los ancianos. Entonces, un modelo incorporando la edad como coeficiente cuadrático tendría que tener, para esa variable, el signo opuesto, positivo:
+Al ser basales las variables clase y género, la ausencia de activación de variables indicará que el caso del intercepto es un caso de una mujer (sin Sexmale activo) de primera clase (sin PClass2 ni PClass3 activo). Sin embargo, al incluir la variable edad ese caso será el de una mujer de 0 años en primera clase. Los casos en los que se activan las otras variables (es segunda o tercera clase en vez de primera, es hombre en vez de mujer) disminuyen la probabilidad esperada de supervivencia. El hecho de tener más años también lo hace. En todos los casos se trata de coeficiente significativos. Con respecto a la edad, una salvedad: será de esperar que la supervivencia según la edad no sea una relación lineal, ya que podrán sobrevivir más los niños pero también los ancianos. Entonces, un modelo incorporando la edad como coeficiente cuadrático tendría que tener, para esa variable, el signo opuesto, positivo:
   
 ```{r}
 modelo2 = glm(Survived ~ Pclass + Sex + Age + I(Age^2), family = 'binomial', data = train)
@@ -111,7 +111,7 @@ roseYJack = data.frame(
 predict(modelo, newdata = roseYJack, type = 'response') # Mediante el tipo 'response' evitamos las log-odds como salida y lo convertimos a probabilidad.
 ```
 
-De esta manera, la probabilidad de supervivencia de Rose es mucho mayor que la de Jack.
+De esta manera, la probabilidad esperada de supervivencia de Rose es mucho mayor que la de Jack.
 
 ### Comparación de modelos
 
