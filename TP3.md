@@ -16,6 +16,8 @@ library(modelr)
 library(pROC)
 ```
 
+titanic = titanic_complete_test
+
 ### Leer el archivo y mostrar su estructura
 
 ```{r}
@@ -29,15 +31,15 @@ Rápidamente vemos la estructura de la tabla y de algunas de sus columnas: ID es
 ### Selección y transformación de variables
 
 You can also embed plots, for example:
-
-```{r}
+  
+  ```{r}
 titanic = titanic %>%
   select(PassengerId, Survived, Pclass, Sex, Age, SibSp, Parch, Fare, Embarked) %>%
   mutate(
     Survived = as.factor(Survived),
     Pclass = as.factor(Pclass),
     Embarked = as.factor(Embarked)
-    )
+  )
 ```
 
 La condición de supervivencia o no, igual que la clase y la de embarcar o no, se interpretaban como números contínuos y en realidad eran variables categóricas. De esta forma se asigna su correcta función.
@@ -84,14 +86,14 @@ validation  = titanic[-idx,]
 ### Modelo inicial
 
 ```{r}
-modelo = glm(Survived ~ Pclass + Sex + Age, family = 'binomial', data = titanic)
+modelo = glm(Survived ~ Pclass + Sex + Age, family = 'binomial', data = train)
 tidy(modelo)
 ```
 
 Al ser basales las variables clase y género, la ausencia de activación de variables indicará que el caso del intercepto es un caso de una mujer (sin Sexmale activo) de primera clase (sin PClass2 ni PClass3 activo). Sin embargo, al incluir la variable edad ese caso será el de una mujer de 0 años en primera clase. Los casos en los que se activan las otras variables (es segunda o tercera clase en vez de primera, es hombre en vez de mujer) disminuyen la probabilidad de supervivencia. El hecho de tener más años también lo hace. En todos los casos se trata de coeficiente significativos. Con respecto a la edad, una salvedad: será de esperar que la supervivencia según la edad no sea una relación lineal, ya que podrán sobrevivir más los niños pero también los ancianos. Entonces, un modelo incorporando la edad como coeficiente cuadrático tendría que tener, para esa variable, el signo opuesto, positivo:
-
+  
 ```{r}
-modelo2 = glm(Survived ~ Pclass + Sex + Age + I(Age^2), family = 'binomial', data = titanic)
+modelo2 = glm(Survived ~ Pclass + Sex + Age + I(Age^2), family = 'binomial', data = train)
 tidy(modelo2)
 ```
 
@@ -103,7 +105,7 @@ Se ve que la tendencia existe aunque muy poco significativa.
 roseYJack = data.frame(
   Pclass = as.factor(c(1, 3)),
   Sex = c('female', 'male'),
-  Age = c(17.0, 20.0)
+  Age = c(17, 20)
 )
 
 predict(modelo, newdata = roseYJack, type = 'response') # Mediante el tipo 'response' evitamos las log-odds como salida y lo convertimos a probabilidad.
@@ -117,15 +119,15 @@ Se realizan cuatro modelos, además del modelo original (1) para analizar la pos
 
 ```{r}
 formulas = formulas(.response = ~Survived,
-                           modelo1 = ~ Pclass + Sex + Age,
-                           modeloClasista = ~Pclass,
-                           modeloSexista = ~Sex,
-                           modeloSexistayClasista = ~Pclass + Sex,
-                           modeloMultivariado = ~Pclass + Sex + Age + Parch + SibSp + Embarked + Fare)
+                    modelo1 = ~ Pclass + Sex + Age,
+                    modeloClasista = ~Pclass,
+                    modeloSexista = ~Sex,
+                    modeloSexistayClasista = ~Pclass + Sex,
+                    modeloMultivariado = ~Pclass + Sex + Age + Parch + SibSp + Embarked + Fare)
 
 models = tibble(formulas) %>%
   mutate(models = names(formulas), expression = paste(formulas),
-         mod = map(formulas, ~glm(.,family = 'binomial', data = titanic)))
+         mod = map(formulas, ~glm(.,family = 'binomial', data = train)))
 
 models %>%
   mutate(tidy = map(mod, tidy)) %>%
@@ -184,12 +186,12 @@ De esta manera se visualiza que el modelo funciona bastante bien para predecir l
 ### Gráfico de métricas de performance
 
 Se introduce el significado de cada métrica, por medio de la pregunta que responde:
-
-- Accuracy: Cuántos precedidos fueron correctos?
-- Precision: Cuántos de los que predijimos como fallecidos lo eran?
-- Sensivity: De los fallecidos, a cuántos predijimos bien?
-- Especificidad: De los que no son fallecidos, a cuántos predijimos bien?
-El score F1 es la media entre la precisión y sensitividad
+  
+  - Accuracy: Cuántos precedidos fueron correctos?
+  - Precision: Cuántos de los que predijimos como fallecidos lo eran?
+  - Sensivity: De los fallecidos, a cuántos predijimos bien?
+  - Especificidad: De los que no son fallecidos, a cuántos predijimos bien?
+  El score F1 es la media entre la precisión y sensitividad
 
 ```{r}
 models_val = models %>%
@@ -252,8 +254,8 @@ sel_cutoff = best_accuracy$cutoff
 sel_accuracy = best_accuracy$estimate
 
 table = prediction_validation_total %>% 
-    mutate(predicted_class=if_else(.fitted>sel_cutoff, 1, 0) %>% as.factor(),
-           Survived= factor(Survived))
+  mutate(predicted_class=if_else(.fitted>sel_cutoff, 1, 0) %>% as.factor(),
+         Survived= factor(Survived))
 
 confusionMatrix(table(table$Survived, table$predicted_class), positive = "1")
 ```
@@ -270,12 +272,12 @@ titanic_test = titanic_test %>%
     Survived = as.factor(Survived),
     Pclass = as.factor(Pclass),
     Embarked = as.factor(Embarked)
-    )
+  )
 
 titanic_test$predict = predict(modelo, titanic_test, type="response")
 table1 = titanic_test %>% 
-    mutate(predicted_class=if_else(predict>sel_cutoff, 1, 0) %>% as.factor(),
-           Survived= factor(Survived))
+  mutate(predicted_class=if_else(predict>sel_cutoff, 1, 0) %>% as.factor(),
+         Survived= factor(Survived))
 confusionMatrix(table(table1$Survived, table1$predicted_class), positive = "1")
 ```
 
