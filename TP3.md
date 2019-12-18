@@ -191,7 +191,7 @@ Se introduce el significado de cada métrica, por medio de la pregunta que respo
   - Precision: Cuántos de los que predijimos como fallecidos lo eran?
   - Sensivity: De los fallecidos, a cuántos predijimos bien?
   - Especificidad: De los que no son fallecidos, a cuántos predijimos bien?
-  El score F1 es la media entre la precisión y sensitividad
+  - El score F1 es la media entre la precisión y sensitividad
 
 ```{r}
 models_val = models %>%
